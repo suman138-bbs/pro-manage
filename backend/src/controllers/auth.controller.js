@@ -61,7 +61,7 @@ export const login = asyncHandler(async (req, res) => {
   }
   const user = await User.findOne({ email }).select("+password");
 
-  if (!user || !user.comparePassword(password)) {
+  if (!user || !(await user.comparePassword(password))) {
     throw new CustomError("Invalid credentials", 400);
   }
 
@@ -99,6 +99,7 @@ export const refresh = asyncHandler(async (req, res) => {
 });
 
 export const logout = asyncHandler(async (req, res) => {
+  console.log("HELLO");
   res.cookie("refresh_token", null, {
     expires: new Date(Date.now()),
     httpOnly: true,
