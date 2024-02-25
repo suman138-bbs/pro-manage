@@ -27,6 +27,10 @@ const todoSchema = new mongoose.Schema(
       enum: ["backlog", "todo", "progress", "done"],
       default: "todo",
     },
+
+    dueDate: {
+      type: String,
+    },
   },
   {
     timestamps: true,

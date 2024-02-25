@@ -16,10 +16,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  todoId: [
+  todos: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Todo",
+      todoId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Todo",
+      },
     },
   ],
 });
