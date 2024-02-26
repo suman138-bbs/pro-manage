@@ -16,6 +16,8 @@ import axios from "../../api/axios";
 const Board = () => {
   const [listDate, setListDate] = useState("today");
   const [createTodo, setCreateTodo] = useState(false);
+  const [isDelete, setIsDelete] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
   const [todo, setTodo] = useState({
     title: "",
     priority: "",
@@ -23,7 +25,7 @@ const Board = () => {
     dueDate: "",
   });
 
-  const [editTodoData, setEditTodoData] = useState([]);
+  const [editTodoData, setEditTodoData] = useState({});
   const [listDateOpen, setListDateOpen] = useState(false);
 
   const [backlogListOpen, setBacklogListOpen] = useState([]);
@@ -53,11 +55,11 @@ const Board = () => {
   };
   const formattedDate = `${addOrdinalSuffix(day)} ${month}, ${year}`;
 
-  // const {
-  //   auth: {
-  //     user: { name },
-  //   },
-  // } = useAuth();
+  const {
+    auth: {
+      user: { name },
+    },
+  } = useAuth();
 
   const [todoTodos, setTodoTodos] = useState([]);
   const [backlogTodos, setBacklogTodos] = useState([]);
@@ -149,6 +151,14 @@ const Board = () => {
 
   const handleCreateTodo = () => {
     setCreateTodo(true);
+    setTodo({
+      title: "",
+      priority: "",
+      checklist: [],
+    });
+  };
+  const handleSetListDate = (type) => {
+    setListDate(type);
   };
 
   const handleDatePicker = () => {
@@ -202,9 +212,60 @@ const Board = () => {
     setTodo({ ...todo, checklist: arr });
   };
 
-  const handleSetListDate = (type) => {
-    setListDate(type);
+  // Edit And Delete section
+
+  const handleConfirmTodoDelete = async () => {
+    console.log(editTodoData);
+    const res = await axios.put("/app/delete-todo", { id: editTodoData._id });
+    toast.success(res.data.message);
+    fetchWithSortData();
+    setIsDelete(false);
   };
+
+  const handleTodoDelete = (todo) => {
+    setIsDelete(!isDelete);
+    setEditTodoData(todo);
+  };
+
+  const handleTodoEdit = (todo) => {
+    setIsEdit(!isEdit);
+    setTodo(todo);
+  };
+
+  const hanldeUpdateTodo = async () => {
+    if (todo.title.length === 0) {
+      toast.error("Todo Name cann't be empty");
+      return;
+    }
+    if (todo.priority.length === 0) {
+      toast.error("select the priority");
+      return;
+    }
+    if (todo.checklist.length === 0) {
+      toast.error("Create at least one checklist");
+      return;
+    }
+
+    const checklistEmpty = todo.checklist.some(
+      (item) => item.name.trim() === ""
+    );
+    if (checklistEmpty) {
+      toast.error("Checklist field shouldn't be empty");
+      return;
+    }
+    const res = await axios.put("app/update-todo", todo);
+    setIsEdit(false);
+    toast.success(res.data.message);
+    fetchWithSortData();
+    setTodo({
+      title: "",
+      priority: "",
+      checklist: [],
+      dueDate: "",
+    });
+  };
+
+  const handleTodoShare = (todo) => {};
 
   console.log(editTodoData);
 
@@ -288,9 +349,27 @@ const Board = () => {
                     <div className={style.threeDotContainer}>
                       {editTodoData.title === todo.title && (
                         <div>
-                          <li>Edit</li>
-                          <li>Share</li>
-                          <li>Delete</li>
+                          <li
+                            onClick={() => {
+                              handleTodoEdit(todo);
+                            }}
+                          >
+                            Edit
+                          </li>
+                          <li
+                            onClick={() => {
+                              handleTodoShare(todo);
+                            }}
+                          >
+                            Share
+                          </li>
+                          <li
+                            onClick={() => {
+                              handleTodoDelete(todo);
+                            }}
+                          >
+                            Delete
+                          </li>
                         </div>
                       )}
                       <img
@@ -426,9 +505,27 @@ const Board = () => {
                     <div className={style.threeDotContainer}>
                       {editTodoData.title === todo.title && (
                         <div>
-                          <li>Edit</li>
-                          <li>Share</li>
-                          <li>Delete</li>
+                          <li
+                            onClick={() => {
+                              handleTodoEdit(todo);
+                            }}
+                          >
+                            Edit
+                          </li>
+                          <li
+                            onClick={() => {
+                              handleTodoShare(todo);
+                            }}
+                          >
+                            Share
+                          </li>
+                          <li
+                            onClick={() => {
+                              handleTodoDelete(todo);
+                            }}
+                          >
+                            Delete
+                          </li>
                         </div>
                       )}
                       <img
@@ -558,9 +655,27 @@ const Board = () => {
                     <div className={style.threeDotContainer}>
                       {editTodoData.title === todo.title && (
                         <div>
-                          <li>Edit</li>
-                          <li>Share</li>
-                          <li>Delete</li>
+                          <li
+                            onClick={() => {
+                              handleTodoEdit(todo);
+                            }}
+                          >
+                            Edit
+                          </li>
+                          <li
+                            onClick={() => {
+                              handleTodoShare(todo);
+                            }}
+                          >
+                            Share
+                          </li>
+                          <li
+                            onClick={() => {
+                              handleTodoDelete(todo);
+                            }}
+                          >
+                            Delete
+                          </li>
                         </div>
                       )}
                       <img
@@ -692,9 +807,27 @@ const Board = () => {
                     <div className={style.threeDotContainer}>
                       {editTodoData.title === todo.title && (
                         <div>
-                          <li>Edit</li>
-                          <li>Share</li>
-                          <li>Delete</li>
+                          <li
+                            onClick={() => {
+                              handleTodoEdit(todo);
+                            }}
+                          >
+                            Edit
+                          </li>
+                          <li
+                            onClick={() => {
+                              handleTodoShare(todo);
+                            }}
+                          >
+                            Share
+                          </li>
+                          <li
+                            onClick={() => {
+                              handleTodoDelete(todo);
+                            }}
+                          >
+                            Delete
+                          </li>
                         </div>
                       )}
                       <img
@@ -916,6 +1049,148 @@ const Board = () => {
                     Cancel
                   </button>
                   <button onClick={handleSubmitCreateTodo}>Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {isDelete && (
+          <div className={style.confirmLogOut}>
+            <div>
+              <h4>Are you sure you want to Delete?</h4>
+              <div>
+                <button onClick={handleConfirmTodoDelete}>Yes, Delete</button>
+              </div>
+              <div>
+                <button
+                  onClick={() => {
+                    setIsDelete(!isDelete);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {isEdit && (
+          <div className={style.todo_input_container}>
+            <div>
+              <div className={style.todo_title_container}>
+                <label htmlFor="">
+                  Title <span className={style.required}>*</span>
+                </label>
+                <input
+                  value={todo.title}
+                  type="text"
+                  placeholder="Enter task title"
+                  onChange={(e) => {
+                    handleTodoname(e.target.value);
+                  }}
+                />
+              </div>
+              <div className={style.priority_container}>
+                <label htmlFor="">
+                  Select Priority <span className={style.required}>*</span>
+                </label>
+                <button
+                  onClick={() => {
+                    handlePriority("high");
+                  }}
+                  style={
+                    todo.priority === "high"
+                      ? { backgroundColor: "#cccccc" }
+                      : {}
+                  }
+                >
+                  <img src={RedDot} alt="" />
+                  <span>HIGH PRIORITY</span>
+                </button>
+                <button
+                  onClick={() => {
+                    handlePriority("moderate");
+                  }}
+                  style={
+                    todo.priority === "moderate"
+                      ? { backgroundColor: "#cccccc" }
+                      : {}
+                  }
+                >
+                  <img src={GreenDot} alt="" />
+                  <span> MODERATE PRIORITY</span>
+                </button>
+                <button
+                  onClick={() => {
+                    handlePriority("low");
+                  }}
+                  style={
+                    todo.priority === "low"
+                      ? { backgroundColor: "#cccccc" }
+                      : {}
+                  }
+                >
+                  <img src={GreenDot} alt="" />
+                  <span> LOW PRIORITY</span>
+                </button>
+              </div>
+              <div className={style.checklist_container}>
+                <h4>
+                  Checklist ({handleMarkCount(todo.checklist)}/
+                  {todo.checklist.length}){" "}
+                  <span className={style.required}>*</span>
+                </h4>
+                <div className={style.checklist_input_container}>
+                  {todo.checklist.map((list, index) => {
+                    return (
+                      <div key={index}>
+                        <input
+                          type="checkbox"
+                          defaultChecked={list.isMarked}
+                          value={list.isMarked}
+                          onChange={(e) => {
+                            handleChecklistChange(e, index);
+                          }}
+                        />
+                        <input
+                          type="text"
+                          value={list.name}
+                          placeholder="Add a task"
+                          onChange={(e) => {
+                            handleChecklistChange(e, index);
+                          }}
+                        />
+                        <img
+                          src={DeleteIcon}
+                          alt=""
+                          onClick={() => {
+                            handleRemoveCheckList(index);
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                  <section className={style.checklist_add_btn}>
+                    <button onClick={handleAddChecklist}>
+                      <span>+</span>
+                      <span>Add New</span>
+                    </button>
+                  </section>
+                </div>
+              </div>
+              <div className={style.button_container}>
+                <div>
+                  {/* <input type="date" ref={dateRef} /> */}
+                  <button onClick={handleDatePicker}>Select Due Date</button>
+                </div>
+                <div>
+                  <button
+                    onClick={() => {
+                      setIsEdit(false);
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button onClick={hanldeUpdateTodo}>update</button>
                 </div>
               </div>
             </div>

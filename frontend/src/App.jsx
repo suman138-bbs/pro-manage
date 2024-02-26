@@ -17,7 +17,6 @@ function App() {
     const handleAuth = async () => {
       const currentRoute = window.location.pathname;
 
-      console.log("Auth", auth);
       if (!auth.name) {
         const path = pathname.split("/").includes("auth");
 

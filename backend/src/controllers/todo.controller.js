@@ -228,5 +228,39 @@ export const getBacklogTodos = asyncHandler(async (req, res) => {
 export const updateTodo = asyncHandler(async (req, res) => {
   const data = req.body;
   await Todo.findByIdAndUpdate(data._id, data);
-  res.status(200).json({ success: true });
+  res.status(200).json({ success: true, message: "Todo Updated Successfully" });
+});
+
+export const deleteTodo = asyncHandler(async (req, res) => {
+  const { id } = req.body;
+  const userId = req.user._id;
+
+  await Todo.findByIdAndDelete(id);
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new CustomError("User not found", 404);
+  }
+
+  user.todos = user.todos.filter((todo) => {
+    return todo && todo.todoId && todo.todoId.toString() !== id;
+  });
+
+  await user.save();
+
+  res.status(200).json({ success: true, message: "Todo Deleted Successfully" });
+});
+
+export const updateProfile = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const user = await User.findById(req.user._id);
+  if (!(await await user.comparePassword(oldPassword))) {
+    throw new CustomError("Password Not Matched");
+  }
+  user.password = newPassword;
+  await user.save();
+  res
+    .status(200)
+    .json({ success: true, message: "Password Changed Successfully" });
 });

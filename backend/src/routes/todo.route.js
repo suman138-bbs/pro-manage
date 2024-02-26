@@ -6,6 +6,8 @@ import {
   getProgressTodos,
   getBacklogTodos,
   updateTodo,
+  deleteTodo,
+  updateProfile,
 } from "../controllers/todo.controller.js";
 import { isLoggedIn } from "../middleware/auth.middleware.js";
 const todoRouter = Router();
@@ -17,5 +19,7 @@ todoRouter.get("/get-progress-todos/:listDate", isLoggedIn, getProgressTodos);
 todoRouter.get("/get-backlog-todos/:listDate", isLoggedIn, getBacklogTodos);
 
 todoRouter.put("/update-todo", isLoggedIn, updateTodo);
+todoRouter.put("/delete-todo", isLoggedIn, deleteTodo);
+todoRouter.post("/update-profile", isLoggedIn, updateProfile);
 
 export default todoRouter;

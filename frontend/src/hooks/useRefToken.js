@@ -5,19 +5,21 @@ import { useNavigate } from "react-router-dom";
 const useRefToken = () => {
   const navigate = useNavigate();
   const { auth, setAuth } = useAuth();
+  if (!auth?.user?.name) {
+    navigate("/auth/login");
+  }
   const refresh = async () => {
     try {
       const response = await axios.get("/auth/refresh", {
         withCredentials: true,
       });
-      setAuth((prev) => {
-        return { ...prev, accessToken: response.data.accessToken };
-      });
-      return response.data.accessToken;
+
+      setAuth(response.data);
+      return response.data;
     } catch (error) {
+      console.log("Error", error);
       if (!error?.data?.success) {
-        console.log("Error", error);
-        navigate("/auth");
+        navigate("/auth/login");
       }
     }
   };

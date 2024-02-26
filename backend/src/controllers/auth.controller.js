@@ -95,7 +95,7 @@ export const refresh = asyncHandler(async (req, res) => {
   const accessToken = user.getJwtAccessToken();
 
   res.cookie("access_token", accessToken, cookieOptions);
-  res.status(200).json({ accessToken });
+  res.status(200).json({ user, accessToken });
 });
 
 export const logout = asyncHandler(async (req, res) => {

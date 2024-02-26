@@ -111,6 +111,7 @@
 }
 .threeDotContainer > img {
   cursor: pointer;
+  padding: 1em;
 }
 .priorityContainer > p {
   text-transform: uppercase;
@@ -363,4 +364,58 @@
   border-radius: 0.5em;
   border: none;
   cursor: pointer;
+}
+
+/*  */
+
+.confirmLogOut {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  left: 0%;
+  top: 0%;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100vw;
+}
+
+.confirmLogOut > div {
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2em;
+  gap: 1em;
+  width: 33%;
+  border-radius: 1em;
+  /* opacity: 0;
+  transition: opacity 2s ease-in-out; */
+}
+
+.confirmLogOut > div > div {
+  width: 100%;
+}
+
+.confirmLogOut > div button {
+  width: 100%;
+  padding: 0.7em 0em;
+  border: none;
+  border-radius: 1em;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.confirmLogOut h4 {
+  color: #000;
+}
+
+.confirmLogOut > div > div:nth-child(2) > button {
+  background-color: #17a2b8;
+  color: #fff;
+}
+.confirmLogOut > div > div:nth-child(3) > button {
+  color: #ff0000;
+  border: 1px solid #ff0000;
+  background-color: transparent;
 }
