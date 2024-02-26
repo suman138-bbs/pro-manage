@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   gap: 3em;
+  color: #000;
 }
 
 .boardDetailContainer {
@@ -21,19 +22,345 @@
 .dateFilterContainer {
   font-weight: lighter;
   margin-top: 1em;
+  /* width: 30%; */
+  display: flex;
+  flex-direction: column;
+  align-items: end;
 }
 .todosTypeContainer {
   display: flex;
   gap: 1em;
   overflow-x: auto;
   height: 90%;
+  width: 100%;
+  scrollbar-width: thin;
 }
 
 .todosTypeContainer > div {
   background-color: #eef2f5;
   padding: 1em;
   flex-shrink: 0;
-  width: 25em;
+  width: 30%;
   height: 100%;
+  border-radius: 0.5em;
   overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3%;
+  scrollbar-width: thin;
+}
+
+.todosTypeContainer > div > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.todosTypeContainer > div > div > img {
+  cursor: pointer;
+}
+
+.checkListContainer {
+  height: auto;
+  width: 98%;
+  padding: 4%;
+  border-radius: 0.4em;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  position: relative;
+}
+.creteTodoContainer {
+  display: flex;
+  gap: 2em;
+}
+.creteTodoContainer > * {
+  cursor: pointer;
+}
+
+.creteTodoContainer > button {
+  font-size: 1.5rem;
+  background-color: transparent;
+  border: none;
+}
+
+.checkListContainer > div:first-child {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.priorityContainer {
+  display: flex;
+  gap: 0.5em;
+}
+.threeDotContainer > div {
+  position: absolute;
+  left: 50%;
+  background-color: #fff;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+  padding: 0.3em 1em;
+  border-radius: 0.4em;
+}
+
+.threeDotContainer > div > li {
+  list-style-type: none;
+  cursor: pointer;
+  padding: 0.2em 0.4em;
+}
+.threeDotContainer > img {
+  cursor: pointer;
+}
+.priorityContainer > p {
+  text-transform: uppercase;
+}
+
+.checkListCount {
+  display: flex;
+  justify-content: space-between;
+}
+.checkListCount > button {
+  height: 10%;
+}
+
+.checkListCount > div > ul {
+  margin-top: 5%;
+  margin-left: 10%;
+  list-style-type: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+}
+
+.checkListCount > div > p {
+  font-weight: 600;
+}
+.checklist_list {
+  border: 1px solid #9f9f9f;
+  border-radius: 0.5em;
+  display: flex;
+  gap: 0.4em;
+  padding: 0.2em 0.4em;
+  width: 13em;
+}
+.todoContainer > div:first-child {
+  margin-bottom: -0.7rem;
+}
+
+.todo_input_container {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  left: 0%;
+  top: 0%;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100vw;
+}
+
+.todo_input_container > div {
+  background-color: #fff;
+  width: 45%;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  height: 80%;
+  border-radius: 0.8em;
+  padding: 1em 2em;
+}
+
+.todo_input_container .priority_container {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+}
+.todo_input_container .priority_container > button {
+  padding: 0.4em 0.4em;
+
+  background-color: transparent;
+  border-radius: 0.7em;
+  border: 1px solid #9f9f9f;
+  display: flex;
+  gap: 0.2em;
+  align-items: center;
+  cursor: pointer;
+}
+.todo_input_container .priority_container > label {
+  font-weight: 600;
+}
+
+.todo_input_container .button_container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.confirmLogOut h4 {
+  color: #000;
+}
+
+.todo_input_container .button_container > div:nth-child(2) button:nth-child(2) {
+  background-color: #17a2b8;
+  color: #fff;
+}
+.todo_input_container .button_container > div:nth-child(2) button:nth-child(1) {
+  color: #ff0000;
+  border: 1px solid #ff0000;
+  background-color: transparent;
+}
+
+/*  */
+.todo_input_container .button_container > div:nth-child(2) {
+  display: flex;
+  gap: 1em;
+  width: 65%;
+}
+
+/*  */
+.todo_input_container .button_container > div:nth-child(2) button {
+  border: none;
+  width: 50%;
+  border-radius: 0.4em;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.required {
+  color: red;
+}
+.todo_title_container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.todo_title_container > input {
+  padding: 0.4em 1em;
+  border-radius: 0.5em;
+  border: 1px solid #9f9f9f;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.15);
+  font-size: 1.1rem;
+  color: #9f9f9f;
+}
+.todo_title_container > label {
+  font-weight: 600;
+}
+
+.todo_title_container > input::placeholder {
+  font-size: 1.1rem;
+  color: #9f9f9f;
+}
+
+.checklist_container {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  width: 100%;
+  height: 100%;
+}
+
+.checklist_add_btn {
+  margin-left: 2%;
+}
+
+.checklist_add_btn > button {
+  display: flex;
+  gap: 0.5em;
+  font-size: 1.1rem;
+  color: #9f9f9f;
+  font-weight: 600;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.checklist_input_container {
+  height: 12em;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5%;
+  position: relative;
+  scrollbar-width: thin;
+}
+
+.checklist_input_container > div {
+  width: 100%;
+  display: flex;
+  gap: 0.5em;
+  border: 1px solid #9f9f9f;
+  padding: 0.4em 1em;
+  border-radius: 0.5em;
+  font-size: 1.1rem;
+  color: #9f9f9f;
+}
+
+.checklist_input_container > div > input[type="checkbox"] {
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 3em;
+  border: 1px solid #9f9f9f;
+
+  border-radius: 3rem;
+}
+.checklist_input_container > div > input:nth-child(2) {
+  width: 100%;
+  border: none;
+  outline: none;
+}
+
+.checklist_input_container div > img {
+  position: absolute;
+  left: 95%;
+  z-index: 100;
+  cursor: pointer;
+}
+
+.todo_list_date {
+  position: relative;
+  display: flex;
+  gap: 1em;
+}
+
+.todo_list_date > img {
+  cursor: pointer;
+}
+.todo_list_date > div {
+  position: absolute;
+  width: 10em;
+  z-index: 100;
+  right: 20%;
+  border-radius: 3%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  padding: 1em 0em 1em 2em;
+  background-color: #fff;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+}
+.todo_list_date > h3 {
+  text-transform: capitalize;
+}
+.todo_list_date > div > h3 {
+  cursor: pointer;
+}
+
+.status_change_btn {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 0.5em;
+}
+
+.status_change_btn > div {
+  display: flex;
+  gap: 0.5em;
+}
+
+.status_change_btn button {
+  padding: 0.4em 0.8em;
+  border-radius: 0.5em;
+  border: none;
+  cursor: pointer;
 }
