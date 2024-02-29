@@ -5,22 +5,27 @@ import User from "../models/user.model.js";
 
 export const createTodo = asyncHandler(async (req, res) => {
   const data = req.body;
+  const userId = req.user._id;
 
   const { title } = data;
-  const duplicateTodo = await Todo.findOne({ title });
+  const { todos } = await User.findById(userId).populate("todos.todoId");
+  const duplicateTodo = todos.find((todo) => todo.todoId.title === title);
+
   if (duplicateTodo) {
-    throw new CustomError("Todo name already exist", 400);
+    throw new CustomError("Todo name already exists", 400);
   }
 
   const newTodo = await Todo.create(data);
 
-  await User.findByIdAndUpdate(req.user._id, {
+  await User.findByIdAndUpdate(userId, {
     $push: { todos: { todoId: newTodo._id } },
   });
 
-  res
-    .status(200)
-    .json({ sucess: true, newTodo, message: "Todo list created successfully" });
+  res.status(200).json({
+    success: true,
+    newTodo,
+    message: "Todo list created successfully",
+  });
 });
 
 export const getTodoTodos = asyncHandler(async (req, res) => {
@@ -67,7 +72,7 @@ export const getTodoTodos = asyncHandler(async (req, res) => {
     default:
       throw new CustomError("Invalid listDate parameter", 400);
   }
-  console.log("T", todos);
+
   res.status(200).json({ status: true, todos });
 });
 
@@ -222,13 +227,34 @@ export const updateTodo = asyncHandler(async (req, res) => {
   const id = data._id;
   const userId = req.user._id;
 
-  await Todo.findByIdAndUpdate(id, data);
-
   const user = await User.findById(userId);
   if (!user) {
     throw new CustomError("User not found", 404);
   }
 
+  const todo = await Todo.findOne({
+    title: data.title,
+    _id: { $in: user.todos.map((todo) => todo.todoId) },
+  });
+
+  if (!todo) {
+    await Todo.findByIdAndUpdate(id, data);
+    res
+      .status(200)
+      .json({ success: true, message: "Todo Updated Successfully" });
+    return;
+  }
+
+  const existingTodo = await Todo.findOne({
+    _id: { $ne: id },
+    title: data.title,
+    _id: { $in: user.todos.map((todo) => todo.todoId) },
+  });
+
+  if (existingTodo?.id !== data._id) {
+    throw new CustomError("Todo name already exists", 400);
+  }
+  await Todo.findByIdAndUpdate(id, data);
   res.status(200).json({ success: true, message: "Todo Updated Successfully" });
 });
 
@@ -254,13 +280,14 @@ export const deleteTodo = asyncHandler(async (req, res) => {
 });
 
 export const updateProfile = asyncHandler(async (req, res) => {
-  const { oldPassword, newPassword } = req.body;
+  const { oldPassword, newPassword, name } = req.body;
 
   const user = await User.findById(req.user._id);
   if (!(await await user.comparePassword(oldPassword))) {
-    throw new CustomError("Password Not Matched");
+    throw new CustomError("Old Password Not Matched");
   }
   user.password = newPassword;
+  user.name = name;
   await user.save();
   res
     .status(200)
@@ -318,7 +345,11 @@ export const getAnalytics = asyncHandler(async (req, res) => {
       highPriorityTasks++;
     }
 
-    if (todo?.dueDate && todo?.status !== "done") {
+    if (
+      todo?.dueDate &&
+      todo?.status !== "done" &&
+      new Date(todo.dueDate) > new Date()
+    ) {
       dueDateTasks++;
     }
   });
