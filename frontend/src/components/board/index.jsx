@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import DatePicker from "react-datepicker";
 
 import useAuth from "../../hooks/useAuth";
 import style from "./style.module.css";
@@ -53,13 +54,40 @@ const Board = () => {
         return `${day}th`;
     }
   };
+  const getMonthName = (month) => {
+    switch (parseInt(month)) {
+      case 1:
+        return "Jan";
+      case 2:
+        return "Feb";
+      case 3:
+        return "Mar";
+      case 4:
+        return "Apr";
+      case 5:
+        return "May";
+      case 6:
+        return "Jun";
+      case 7:
+        return "Jul";
+      case 8:
+        return "Aug";
+      case 9:
+        return "Sep";
+      case 10:
+        return "Oct";
+      case 11:
+        return "Nov";
+      case 12:
+        return "Dec";
+      default:
+        return "Invalid Month";
+    }
+  };
+
   const formattedDate = `${addOrdinalSuffix(day)} ${month}, ${year}`;
 
-  const {
-    auth: {
-      user: { name },
-    },
-  } = useAuth();
+  const { auth } = useAuth();
 
   const [todoTodos, setTodoTodos] = useState([]);
   const [backlogTodos, setBacklogTodos] = useState([]);
@@ -99,15 +127,19 @@ const Board = () => {
       return;
     }
 
-    const res = await axios.post("app/create-todo", todo);
+    try {
+      const res = await axios.post("app/create-todo", todo);
 
-    toast.success(res.data.message);
-    setTodo({
-      title: "",
-      priority: "",
-      checklist: [],
-    });
-    setCreateTodo(!createTodo);
+      toast.success(res.data.message);
+      setTodo({
+        title: "",
+        priority: "",
+        checklist: [],
+      });
+      setCreateTodo(!createTodo);
+    } catch (error) {
+      toast.error(error.response.data.message || "Todo name already exist");
+    }
   }, [todo]);
 
   const handleMarkCount = (arr) => {
@@ -123,24 +155,27 @@ const Board = () => {
     if (data[1] === "checkbox") {
       data[0].checklist[data[2]].isMarked =
         !data[0].checklist[data[2]].isMarked;
-      const res = await axios.put("app/update-todo", data[0]);
+      const res = await axios.put("app/update-todo", {
+        data: data[0],
+        type: "checkbox",
+      });
       fetchWithSortData();
     } else if (data[1] === "progress") {
       data[0].status = "progress";
-      await axios.put("app/update-todo", data[0]);
+      await axios.put("app/update-todo", { data: data[0] });
 
       fetchWithSortData();
     } else if (data[1] === "todo") {
       data[0].status = "todo";
-      await axios.put("app/update-todo", data[0]);
+      await axios.put("app/update-todo", { data: data[0] });
       fetchWithSortData();
     } else if (data[1] === "done") {
       data[0].status = "done";
-      await axios.put("app/update-todo", data[0]);
+      await axios.put("app/update-todo", { data: data[0] });
       fetchWithSortData();
     } else if (data[1] === "backlog") {
       data[0].status = "backlog";
-      await axios.put("app/update-todo", data[0]);
+      await axios.put("app/update-todo", { data: data[0] });
       fetchWithSortData();
     }
   };
@@ -161,9 +196,9 @@ const Board = () => {
     setListDate(type);
   };
 
-  const handleDatePicker = () => {
-    console.log(dateRef);
-    dateRef.current.onClick();
+  const handleDatePicker = (e) => {
+    console.log(e.bubbles);
+    setTodo({ ...todo, dueDate: e.target.value });
   };
 
   const handleAddChecklist = () => {
@@ -253,7 +288,7 @@ const Board = () => {
       toast.error("Checklist field shouldn't be empty");
       return;
     }
-    const res = await axios.put("app/update-todo", todo);
+    const res = await axios.put("app/update-todo", { data: todo });
     setIsEdit(false);
     toast.success(res.data.message);
     fetchWithSortData();
@@ -265,16 +300,24 @@ const Board = () => {
     });
   };
 
-  const handleTodoShare = (todo) => {};
-
-  console.log(editTodoData);
+  const handleTodoShare = (todo) => {
+    const todoURL = `${`http://localhost:5173/todo/`}${todo._id}`;
+    navigator.clipboard
+      .writeText(todoURL)
+      .then(() => {
+        toast.success("URL copied to clipboard!");
+      })
+      .catch((error) => {
+        toast.error("Error copying to clipboard");
+      });
+  };
 
   return (
     <>
       <div className={style.boardContainer}>
         <div className={style.boardDetailContainer}>
           <div>
-            <h3>Welcome! {name}</h3>
+            <h3>Welcome! {auth?.user?.name}</h3>
             <h2>Board</h2>
           </div>
           <div className={style.dateFilterContainer}>
@@ -443,8 +486,26 @@ const Board = () => {
                     </div>
 
                     <div className={style.status_change_btn}>
-                      {todo?.dueDate && <button>{todo.dueDate}</button>}
                       <div>
+                        {todo?.dueDate && (
+                          <button
+                            className={style.dueDateBtn}
+                            style={
+                              new Date(todo.dueDate) < new Date()
+                                ? {
+                                    backgroundColor: "#CF3636",
+                                    color: "white",
+                                  }
+                                : {}
+                            }
+                          >
+                            {`${getMonthName(
+                              todo.dueDate.split("-")[1]
+                            )} ${addOrdinalSuffix(
+                              parseInt(todo.dueDate.split("-")[2])
+                            )}`}
+                          </button>
+                        )}
                         <button
                           onClick={() => {
                             handleCheckedChange(todo, "progress");
@@ -594,8 +655,26 @@ const Board = () => {
                       )}
                     </div>
                     <div className={style.status_change_btn}>
-                      {todo?.dueDate && <button>{todo.dueDate}</button>}
                       <div>
+                        {todo?.dueDate && (
+                          <button
+                            className={style.dueDateBtn}
+                            style={
+                              new Date(todo.dueDate) < new Date()
+                                ? {
+                                    backgroundColor: "#CF3636",
+                                    color: "white",
+                                  }
+                                : {}
+                            }
+                          >
+                            {`${getMonthName(
+                              todo.dueDate.split("-")[1]
+                            )} ${addOrdinalSuffix(
+                              parseInt(todo.dueDate.split("-")[2])
+                            )}`}
+                          </button>
+                        )}
                         <button
                           onClick={() => {
                             handleCheckedChange(todo, "backlog");
@@ -748,8 +827,26 @@ const Board = () => {
                       )}
                     </div>
                     <div className={style.status_change_btn}>
-                      {todo?.dueDate && <button>{todo.dueDate}</button>}
                       <div>
+                        {todo?.dueDate && (
+                          <button
+                            className={style.dueDateBtn}
+                            style={
+                              new Date(todo.dueDate) < new Date()
+                                ? {
+                                    backgroundColor: "#CF3636",
+                                    color: "white",
+                                  }
+                                : {}
+                            }
+                          >
+                            {`${getMonthName(
+                              todo.dueDate.split("-")[1]
+                            )} ${addOrdinalSuffix(
+                              parseInt(todo.dueDate.split("-")[2])
+                            )}`}
+                          </button>
+                        )}
                         <button
                           onClick={() => {
                             handleCheckedChange(todo, "backlog");
@@ -897,8 +994,22 @@ const Board = () => {
                       )}
                     </div>
                     <div className={style.status_change_btn}>
-                      {todo?.dueDate && <button>{todo.dueDate}</button>}
                       <div>
+                        {todo?.dueDate && (
+                          <button
+                            className={style.dueDateBtn}
+                            style={{
+                              backgroundColor: "#63C05B",
+                              color: "white",
+                            }}
+                          >
+                            {`${getMonthName(
+                              todo.dueDate.split("-")[1]
+                            )} ${addOrdinalSuffix(
+                              parseInt(todo.dueDate.split("-")[2])
+                            )}`}
+                          </button>
+                        )}
                         <button
                           onClick={() => {
                             handleCheckedChange(todo, "backlog");
@@ -1032,8 +1143,14 @@ const Board = () => {
               </div>
               <div className={style.button_container}>
                 <div>
-                  {/* <input type="date" ref={dateRef} /> */}
-                  <button onClick={handleDatePicker}>Select Due Date</button>
+                  <input
+                    type="date"
+                    ref={dateRef}
+                    placeholder="Due Date"
+                    onChange={(e) => {
+                      handleDatePicker(e);
+                    }}
+                  />
                 </div>
                 <div>
                   <button
@@ -1179,8 +1296,13 @@ const Board = () => {
               </div>
               <div className={style.button_container}>
                 <div>
-                  {/* <input type="date" ref={dateRef} /> */}
-                  <button onClick={handleDatePicker}>Select Due Date</button>
+                  <input
+                    type="date"
+                    ref={dateRef}
+                    onChange={(e) => {
+                      handleDatePicker(e);
+                    }}
+                  />
                 </div>
                 <div>
                   <button

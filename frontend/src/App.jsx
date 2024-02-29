@@ -6,6 +6,7 @@ import PrivateLayout from "./layout/private";
 
 import useAuth from "./hooks/useAuth";
 import useRefToken from "./hooks/useRefToken";
+import SharedTodo from "./components/todo";
 
 function App() {
   const { auth } = useAuth();
@@ -24,6 +25,7 @@ function App() {
           navigate(currentRoute);
           return;
         }
+
         if (currentRoute.startsWith("/auth")) {
           navigate(currentRoute);
           return;
@@ -60,7 +62,7 @@ function App() {
     },
     {
       path: "/todo/:id",
-      element: <h1>Its Shared checklist</h1>,
+      element: <SharedTodo />,
     },
   ]);
 

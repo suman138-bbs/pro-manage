@@ -37,7 +37,7 @@ export const getTodoTodos = asyncHandler(async (req, res) => {
         _id: {
           $in: (await User.findById(userId)).todos.map((todo) => todo.todoId),
         },
-      });
+      }).sort({ createdAt: 1 });
       break;
     case "this week":
       const startOfWeek = new Date();
@@ -50,26 +50,24 @@ export const getTodoTodos = asyncHandler(async (req, res) => {
         _id: {
           $in: (await User.findById(userId)).todos.map((todo) => todo.todoId),
         },
-      });
+      }).sort({ createdAt: 1 });
       break;
     case "this month":
       const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      const endOfMonth = new Date(startOfMonth);
-      endOfMonth.setMonth(endOfMonth.getMonth() + 1);
-      endOfMonth.setDate(endOfMonth.getDate() - 1);
+      startOfMonth.setDate(startOfMonth.getDate() - 30);
+      const endOfMonth = new Date();
       todos = await Todo.find({
         status: "todo",
         createdAt: { $gte: startOfMonth, $lte: endOfMonth },
         _id: {
           $in: (await User.findById(userId)).todos.map((todo) => todo.todoId),
         },
-      });
+      }).sort({ createdAt: 1 });
       break;
     default:
       throw new CustomError("Invalid listDate parameter", 400);
   }
-
+  console.log("T", todos);
   res.status(200).json({ status: true, todos });
 });
 
@@ -87,7 +85,7 @@ export const getProgressTodos = asyncHandler(async (req, res) => {
         _id: {
           $in: (await User.findById(userId)).todos.map((todo) => todo.todoId),
         },
-      });
+      }).sort({ createdAt: 1 });
       break;
     case "this week":
       const startOfWeek = new Date();
@@ -100,21 +98,19 @@ export const getProgressTodos = asyncHandler(async (req, res) => {
         _id: {
           $in: (await User.findById(userId)).todos.map((todo) => todo.todoId),
         },
-      });
+      }).sort({ createdAt: 1 });
       break;
     case "this month":
       const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      const endOfMonth = new Date(startOfMonth);
-      endOfMonth.setMonth(endOfMonth.getMonth() + 1);
-      endOfMonth.setDate(endOfMonth.getDate() - 1);
+      startOfMonth.setDate(startOfMonth.getDate() - 30);
+      const endOfMonth = new Date();
       todos = await Todo.find({
         status: "progress",
         createdAt: { $gte: startOfMonth, $lte: endOfMonth },
         _id: {
           $in: (await User.findById(userId)).todos.map((todo) => todo.todoId),
         },
-      });
+      }).sort({ createdAt: 1 });
       break;
     default:
       throw new CustomError("Invalid listDate parameter", 400);
@@ -137,7 +133,7 @@ export const getDoneTodos = asyncHandler(async (req, res) => {
         _id: {
           $in: (await User.findById(userId)).todos.map((todo) => todo.todoId),
         },
-      });
+      }).sort({ createdAt: 1 });
       break;
     case "this week":
       const startOfWeek = new Date();
@@ -150,21 +146,19 @@ export const getDoneTodos = asyncHandler(async (req, res) => {
         _id: {
           $in: (await User.findById(userId)).todos.map((todo) => todo.todoId),
         },
-      });
+      }).sort({ createdAt: 1 });
       break;
     case "this month":
       const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      const endOfMonth = new Date(startOfMonth);
-      endOfMonth.setMonth(endOfMonth.getMonth() + 1);
-      endOfMonth.setDate(endOfMonth.getDate() - 1);
+      startOfMonth.setDate(startOfMonth.getDate() - 30);
+      const endOfMonth = new Date();
       todos = await Todo.find({
         status: "done",
         createdAt: { $gte: startOfMonth, $lte: endOfMonth },
         _id: {
           $in: (await User.findById(userId)).todos.map((todo) => todo.todoId),
         },
-      });
+      }).sort({ createdAt: 1 });
       break;
     default:
       throw new CustomError("Invalid listDate parameter", 400);
@@ -188,7 +182,7 @@ export const getBacklogTodos = asyncHandler(async (req, res) => {
         _id: {
           $in: (await User.findById(userId)).todos.map((todo) => todo.todoId),
         },
-      });
+      }).sort({ createdAt: 1 });
       break;
     case "this week":
       const startOfWeek = new Date();
@@ -201,21 +195,19 @@ export const getBacklogTodos = asyncHandler(async (req, res) => {
         _id: {
           $in: (await User.findById(userId)).todos.map((todo) => todo.todoId),
         },
-      });
+      }).sort({ createdAt: 1 });
       break;
     case "this month":
       const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      const endOfMonth = new Date(startOfMonth);
-      endOfMonth.setMonth(endOfMonth.getMonth() + 1);
-      endOfMonth.setDate(endOfMonth.getDate() - 1);
+      startOfMonth.setDate(startOfMonth.getDate() - 30);
+      const endOfMonth = new Date();
       todos = await Todo.find({
         status: "backlog",
         createdAt: { $gte: startOfMonth, $lte: endOfMonth },
         _id: {
           $in: (await User.findById(userId)).todos.map((todo) => todo.todoId),
         },
-      });
+      }).sort({ createdAt: 1 });
       break;
     default:
       throw new CustomError("Invalid listDate parameter", 400);
@@ -226,8 +218,17 @@ export const getBacklogTodos = asyncHandler(async (req, res) => {
 /////
 
 export const updateTodo = asyncHandler(async (req, res) => {
-  const data = req.body;
-  await Todo.findByIdAndUpdate(data._id, data);
+  const { data, type } = req.body;
+  const id = data._id;
+  const userId = req.user._id;
+
+  await Todo.findByIdAndUpdate(id, data);
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new CustomError("User not found", 404);
+  }
+
   res.status(200).json({ success: true, message: "Todo Updated Successfully" });
 });
 
@@ -254,6 +255,7 @@ export const deleteTodo = asyncHandler(async (req, res) => {
 
 export const updateProfile = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
+
   const user = await User.findById(req.user._id);
   if (!(await await user.comparePassword(oldPassword))) {
     throw new CustomError("Password Not Matched");
@@ -263,4 +265,74 @@ export const updateProfile = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json({ success: true, message: "Password Changed Successfully" });
+});
+
+export const getTodoById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const todo = await Todo.findById(id);
+  if (!todo) {
+    res
+      .status(200)
+      .json({ success: false, message: "Todo is either Deleted or Not Found" });
+    return;
+  }
+  res.status(200).json({ success: true, todo });
+});
+
+export const getAnalytics = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  const { todos } = await User.findById(userId).populate("todos.todoId");
+  const tod = todos.map((t) => {
+    return t.todoId;
+  });
+  if (!todos) {
+    throw new CustomError("User not found", 404);
+  }
+
+  let backlogTasks = 0;
+  let todoTasks = 0;
+  let inProgressTasks = 0;
+  let completedTasks = 0;
+  let lowPriorityTasks = 0;
+  let moderatePriorityTasks = 0;
+  let highPriorityTasks = 0;
+  let dueDateTasks = 0;
+
+  tod.forEach((todo) => {
+    if (todo?.status === "backlog") {
+      backlogTasks++;
+    } else if (todo?.status === "todo") {
+      todoTasks++;
+    } else if (todo?.status === "progress") {
+      inProgressTasks++;
+    } else if (todo?.status === "done") {
+      completedTasks++;
+    }
+
+    if (todo?.priority === "low") {
+      lowPriorityTasks++;
+    } else if (todo?.priority === "moderate") {
+      moderatePriorityTasks++;
+    } else if (todo?.priority === "high") {
+      highPriorityTasks++;
+    }
+
+    if (todo?.dueDate && todo?.status !== "done") {
+      dueDateTasks++;
+    }
+  });
+
+  const analyticsData = {
+    backlogTasks,
+    todoTasks,
+    inProgressTasks,
+    completedTasks,
+    lowPriorityTasks,
+    moderatePriorityTasks,
+    highPriorityTasks,
+    dueDateTasks,
+  };
+
+  res.status(200).json({ success: true, analytics: analyticsData });
 });
